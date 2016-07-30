@@ -2,6 +2,7 @@ package tech.shadowsystems.dw;
 
 import org.bukkit.plugin.java.JavaPlugin;
 import tech.shadowsystems.dw.files.FileSystem;
+import tech.shadowsystems.dw.world.WorldExtension;
 
 /**
  * Copyright © 2016 Jordan Osterberg and Shadow Technical Systems LLC. All rights reserved. Please email jordan.osterberg@shadowsystems.tech for usage rights and other information.
