@@ -21,28 +21,11 @@ public class WorldExtension {
         runnable.run();
     }
 
-    /**
-     * TODO FIX THIS
-     */
+
     public void deleteWorld() {
-//        File file = new File(Bukkit.getServer().getWorldContainer().getAbsolutePath(), world.getName());
-//        System.out.print("File path is " + file.getPath());
-//        System.out.print("Requested file path is " + Bukkit.getServer().getWorldContainer().getAbsolutePath());
-//        System.out.print("2ndary Requested file path is " + Bukkit.getServer().getWorldContainer());
-//        delete(file);
-
         Bukkit.unloadWorld(world, false);
-
-//        String rootDirectory = Bukkit.getServer().getWorldContainer().getAbsolutePath();
-//        System.out.print(rootDirectory);
-//        File data = new File(rootDirectory + "/" + world.getName());
-//        System.out.print(data.getPath());
-//        delete(data);
-
-        File data = world.getWorldFolder();
-        System.out.print(data.getPath());
-        delete(data);
-
+        File file = new File(Bukkit.getServer().getWorldContainer().getAbsolutePath(), world.getName());
+        delete(file);
     }
 
     private void delete(File delete){
@@ -63,4 +46,7 @@ public class WorldExtension {
         }
     }
 
+    public World getWorld() {
+        return world;
+    }
 }

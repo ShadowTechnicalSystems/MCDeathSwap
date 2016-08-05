@@ -1,6 +1,7 @@
 package tech.shadowsystems.dw;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import tech.shadowsystems.dw.files.FileSystem;
@@ -17,6 +18,7 @@ import java.util.UUID;
  */
 public class DeathSwap {
     private static DeathSwap ourInstance = new DeathSwap();
+
     public static DeathSwap getInstance() {
         return ourInstance;
     }
@@ -24,10 +26,13 @@ public class DeathSwap {
     }
 
     private int gameID = 0;
-    private UUID firstPlayer;
-    private UUID secondPlayer;
+    private int swapsSoFar = 0;
+    private Player firstPlayer;
+    private Player secondPlayer;
     private List<UUID> queue = new ArrayList<>();
     private WorldExtension worldExtension;
+    private boolean firstSwap = true;
+    private boolean running = false;
 
     public void onEnable() {
         gameID = FileSystem.getInstance().getSystemStats().getGameid();
@@ -46,13 +51,21 @@ public class DeathSwap {
         }
     }
 
-    public void startGame(final Player one, Player two) {
+    public void startGame(Player one, Player two) {
         if (!GameState.isGameState(GameState.LOBBY)) {
             return;
         }
 
-        this.firstPlayer = one.getUniqueId();
-        this.secondPlayer = two.getUniqueId();
+        running = true;
+
+        this.firstPlayer = one;
+        this.secondPlayer = two;
+
+        getFirstPlayer().getInventory().clear();
+        getSecondPlayer().getInventory().clear();
+        getFirstPlayer().getInventory().setArmorContents(null);
+        getSecondPlayer().getInventory().setArmorContents(null);
+
         GameState.setGameState(GameState.WORLD_GENERATING);
         broadcast("&cThe world is generating, prepare for lag.");
 
@@ -60,8 +73,8 @@ public class DeathSwap {
             @Override
             public void run() {
                 GameState.setGameState(GameState.INGAME);
-                broadcast("&cWorld generated. You are playing game #" + getGameID());
-                broadcast("&aYou will now be teleported, and the game will start in 30 seconds.");
+                broadcast("&cWorld generated.");
+                broadcast("&aYou will now be teleported. The game has started.");
                 new SwapTask().runTask(DeathSwapPlugin.getInstance());
             }
         });
@@ -72,9 +85,26 @@ public class DeathSwap {
         Bukkit.broadcastMessage(ChatUtil.formatWithPrefix(message));
     }
 
-    public void stopGame() {
+    public void stopGame(Player winner) {
+        running = false;
+
+        GameState.setGameState(GameState.RESETTING);
+
+        getFirstPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 256, 0));
+        getSecondPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 256, 0));
+
+        getFirstPlayer().getInventory().clear();
+        getSecondPlayer().getInventory().clear();
+        getFirstPlayer().getInventory().setArmorContents(null);
+        getSecondPlayer().getInventory().setArmorContents(null);
+
+        broadcast("&a" + winner.getName() + " won deathswap!");
+
+        worldExtension.deleteWorld();
 
         gameID++;
+
+        GameState.setGameState(GameState.LOBBY);
     }
 
     public int getGameID() {
@@ -82,15 +112,52 @@ public class DeathSwap {
     }
 
     public boolean isUserPlaying(Player player) {
-        return firstPlayer == player.getUniqueId() || secondPlayer == player.getUniqueId();
+        if (!isRunning()) {
+            return true;
+        }
+        return firstPlayer == player || secondPlayer == player;
+    }
+
+    public boolean isFirstSwap() {
+        return firstSwap;
+    }
+
+    public void setFirstSwap(boolean firstSwap) {
+        this.firstSwap = firstSwap;
+    }
+
+    public Player getFirstPlayer() {
+        return firstPlayer;
+    }
+
+    public Player getSecondPlayer() {
+        return secondPlayer;
+    }
+
+    public WorldExtension getWorldExtension() {
+        return worldExtension;
+    }
+
+    public int getSwapsSoFar() {
+        return swapsSoFar;
+    }
+
+    public void setSwapsSoFar(int swapsSoFar) {
+        this.swapsSoFar = swapsSoFar;
+    }
+
+    public boolean isRunning() {
+        return running;
+    }
+
+    public boolean isInQueue(Player player) {
+        return queue.contains(player.getUniqueId());
     }
 
     /*
 
       // TODO LIST
-      - Add listeners for death
       - Add admin command for spawning join NPC
-      - Finish SwapTask
       - Add spectator option
 
       == General Idea ==

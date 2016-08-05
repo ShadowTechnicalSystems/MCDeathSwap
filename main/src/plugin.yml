@@ -1,3 +1,6 @@
 name: DeathSwap
 main: tech.shadowsystems.dw.DeathSwapPlugin
 version: 1.0
+commands:
+  test:
+    description: The test command.

@@ -21,8 +21,14 @@ public class PlayerInteract implements Listener {
 
         if (entity.getCustomName() != null && entity.getCustomName().toLowerCase().contains("join deathswap")) {
             if (GameState.isGameState(GameState.LOBBY)) {
+                if (DeathSwap.getInstance().isInQueue(player)) {
+                    player.sendMessage(ChatUtil.formatWithPrefix("You're already in the DeathSwap queue!"));
+                    return;
+                }
                 player.sendMessage(ChatUtil.formatWithPrefix("You're in the DeathSwap queue."));
                 DeathSwap.getInstance().joinQueue(player);
+                player.closeInventory();
+                event.setCancelled(true);
             }
         }
 
