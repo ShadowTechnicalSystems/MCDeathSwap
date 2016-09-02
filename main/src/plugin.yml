@@ -2,5 +2,5 @@ name: DeathSwap
 main: tech.shadowsystems.dw.DeathSwapPlugin
 version: 1.0
 commands:
-  test:
-    description: The test command.
+  spawnNPC:
+    description: The command to spawn the NPC for joining the game.

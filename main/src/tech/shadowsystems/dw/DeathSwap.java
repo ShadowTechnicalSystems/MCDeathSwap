@@ -3,6 +3,7 @@ package tech.shadowsystems.dw;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
 import tech.shadowsystems.dw.files.FileSystem;
 import tech.shadowsystems.dw.tasks.SwapTask;
@@ -90,13 +91,19 @@ public class DeathSwap {
 
         GameState.setGameState(GameState.RESETTING);
 
-        getFirstPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 256, 0));
-        getSecondPlayer().teleport(new Location(Bukkit.getWorld("world"), 0, 256, 0));
+        getFirstPlayer().teleport(getLobbyLocation());
+        getSecondPlayer().teleport(getLobbyLocation());
 
         getFirstPlayer().getInventory().clear();
         getSecondPlayer().getInventory().clear();
         getFirstPlayer().getInventory().setArmorContents(null);
         getSecondPlayer().getInventory().setArmorContents(null);
+
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            for (PotionEffect potionEffect : player.getActivePotionEffects()) {
+                player.removePotionEffect(potionEffect.getType());
+            }
+        }
 
         broadcast("&a" + winner.getName() + " won deathswap!");
 
@@ -105,6 +112,14 @@ public class DeathSwap {
         gameID++;
 
         GameState.setGameState(GameState.LOBBY);
+    }
+
+    public Location getLobbyLocation() {
+        if (DeathSwapPlugin.getInstance().getConfig().get("locations.lobby") == null) {
+            return null;
+        }
+
+        return new Location(Bukkit.getWorld(DeathSwapPlugin.getInstance().getConfig().getString("locations.lobby.world")), DeathSwapPlugin.getInstance().getConfig().getInt("locations.lobby.x"), DeathSwapPlugin.getInstance().getConfig().getInt("locations.lobby.y"), DeathSwapPlugin.getInstance().getConfig().getInt("locations.lobby.z"));
     }
 
     public int getGameID() {
@@ -153,23 +168,5 @@ public class DeathSwap {
     public boolean isInQueue(Player player) {
         return queue.contains(player.getUniqueId());
     }
-
-    /*
-
-      // TODO LIST
-      - Add admin command for spawning join NPC
-      - Add spectator option
-
-      == General Idea ==
-      2 players playing
-      Takes whole server
-      Creates new world every game
-      No killing for 3 swaps
-
-      == After release ==
-      API
-      ...
-
-     */
 
 }

@@ -31,6 +31,10 @@ public class DeathSwapPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerDamage(), this);
         getServer().getPluginManager().registerEvents(new PlayerInteract(), this);
         getServer().getPluginManager().registerEvents(new PlayerLogin(), this);
+
+        getConfig().options().copyDefaults(true);
+        getConfig().options().copyHeader(true);
+        saveDefaultConfig();
     }
 
     public void onDisable() {
@@ -46,10 +50,17 @@ public class DeathSwapPlugin extends JavaPlugin {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            Villager villager = (Villager) player.getLocation().getWorld().spawnEntity(player.getLocation(), EntityType.VILLAGER);
-            villager.setCustomName(ChatUtil.format("&aJoin DeathSwap"));
-            villager.setProfession(Villager.Profession.BUTCHER);
-            villager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 999999, 999999));
+            if (command.getName().equalsIgnoreCase("spawnNPC")) {
+                if (!player.hasPermission("deathswap.admin")) {
+                    player.sendMessage(ChatUtil.formatWithPrefix("&cYou do not have permission to use this command!"));
+                    return true;
+                }
+
+                Villager villager = (Villager) player.getLocation().getWorld().spawnEntity(player.getLocation(), EntityType.VILLAGER);
+                villager.setCustomName(ChatUtil.format("&aJoin DeathSwap"));
+                villager.setProfession(Villager.Profession.BUTCHER);
+                villager.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 999999, 999999));
+            }
 
         }
         return false;

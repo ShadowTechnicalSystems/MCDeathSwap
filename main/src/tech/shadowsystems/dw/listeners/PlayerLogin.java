@@ -1,7 +1,5 @@
 package tech.shadowsystems.dw.listeners;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,12 +32,16 @@ public class PlayerLogin implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        event.setJoinMessage(null);
+
         Player player = event.getPlayer();
-        player.teleport(new Location(Bukkit.getWorld("world"), 0, 256, 0));
+        player.teleport(DeathSwap.getInstance().getLobbyLocation());
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
+        event.setQuitMessage(null);
+
         Player player = event.getPlayer();
         if (GameState.isGameState(GameState.INGAME)) {
             player.damage(9001);

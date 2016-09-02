@@ -24,7 +24,7 @@ public class WorldExtension {
 
     public void deleteWorld() {
         Bukkit.unloadWorld(world, false);
-        File file = new File(Bukkit.getServer().getWorldContainer().getAbsolutePath(), world.getName());
+        File file = new File(Bukkit.getServer().getWorldContainer().getAbsolutePath() + File.pathSeparator + world.getName());
         delete(file);
     }
 
@@ -49,4 +49,5 @@ public class WorldExtension {
     public World getWorld() {
         return world;
     }
+
 }
